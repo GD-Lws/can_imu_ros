@@ -17,7 +17,7 @@ import math
 import rospy
 from sensor_msgs.msg import Imu
 from sensor_msgs.msg import JointState
-from can_imu_lws.msg import IMU_Euler
+from can_imu_lws.msg import IMU_Euler_msg
 
 
 origin_imu_id = 0x54
@@ -40,7 +40,7 @@ left_thigh_imu_current_list = [0, 0, 0]
 right_shank_imu_current_list = [0, 0, 0]
 left_shank_imu_current_list = [0, 0, 0]
 
-can_id_exit_list = [0, 0, 0, 0, 0, 0 ,0]
+can_id_exit_list = [0, 0, 0, 0, 0, 0,0]
 
 # imu_current_list = [origin_imu_id_current_list, right_thigh_imu_current_list, right_shank_imu_current_list, left_thigh_imu_current_list, left_shank_imu_current_list]
 
@@ -77,30 +77,34 @@ def euler_callback(data):
         left_shank_imu_current_list = [euler_to_radian(data.Yaw), euler_to_radian(data.Roll), euler_to_radian(data.Pitch)]
 
     # right
-    if can_id_exit_list[origin_imu_id - 0x50] != 0 and can_id_flag[right_thigh_id - 0x50] != 0:
+    if can_id_exit_list[origin_imu_id - 0x50] != 0 and can_id_exit_list[right_thigh_id - 0x50] != 0:
         joint_position_list[0] = right_thigh_imu_current_list[0] - origin_imu_id_current_list[0]
         # leg rise
         joint_position_list[1] = right_thigh_imu_current_list[2] - origin_imu_id_current_list[2]
         joint_position_list[2] = right_thigh_imu_current_list[1] - origin_imu_id_current_list[1]
     else:
-        joint_position_list[0,1,2] = [0,0,0]
+        joint_position_list[0] = 0
+        joint_position_list[1] = 0
+        joint_position_list[2] = 0
 
-    if can_id_exit_list[right_shank_id - 0x50] != 0 and can_id_flag[right_thigh_id - 0x50] != 0:
+    if can_id_exit_list[right_shank_id - 0x50] != 0 and can_id_exit_list[right_thigh_id - 0x50] != 0:
         joint_position_list[3] = right_shank_imu_current_list[2] - right_thigh_imu_current_list[2]
     else:
         joint_position_list[3] = 0
 
 
     # left
-    if can_id_exit_list[origin_imu_id - 0x50] != 0 and can_id_flag[left_thigh_id - 0x50] != 0:
+    if can_id_exit_list[origin_imu_id - 0x50] != 0 and can_id_exit_list[left_thigh_id - 0x50] != 0:
         joint_position_list[6] = left_thigh_imu_current_list[0] - origin_imu_id_current_list[0]
         # leg rise
         joint_position_list[7] = left_thigh_imu_current_list[2] - origin_imu_id_current_list[2]
         joint_position_list[8] = left_thigh_imu_current_list[1] - origin_imu_id_current_list[1]
     else:
-        joint_position_list[6,7,8] = [0,0,0]
-    
-    if can_id_exit_list[left_shank_id - 0x50] != 0 and can_id_flag[left_thigh_id - 0x50] != 0:
+        joint_position_list[6] = 0
+        joint_position_list[7] = 0
+        joint_position_list[8] = 0
+
+    if can_id_exit_list[left_shank_id - 0x50] != 0 and can_id_exit_list[left_thigh_id - 0x50] != 0:
         joint_position_list[9] = left_shank_imu_current_list[2] - right_thigh_imu_current_list[2]   
     else:
         joint_position_list[9] = 0
@@ -113,7 +117,7 @@ def listener():
     global joint_state_pub
     rospy.init_node('imu_to_jointState_node', anonymous=True)
     joint_state_pub = rospy.Publisher('joint_states', JointState, queue_size=10)
-    imu_euler_sub = rospy.Subscriber('imu_euler_pub', IMU_Euler, euler_callback)
+    imu_euler_sub = rospy.Subscriber('imu_euler_pub', IMU_Euler_msg, euler_callback)
    
     rospy.spin()
 

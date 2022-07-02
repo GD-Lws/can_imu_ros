@@ -6,7 +6,7 @@ import time
 import rospy
 from sensor_msgs.msg import Imu
 from tf.transformations import quaternion_from_euler
-from beginner_tutorials.msg import IMU_Euler
+from can_imu_lws.msg import IMU_Euler_msg
 from Can_Derive import Can_Derive
 
 
@@ -60,7 +60,7 @@ def imu_data_process(receive_date, index, result_date, data_type):
 # imu_publisher=rospy.Publisher('ros_imu', Imu, queue_size=10)
 class HWT901B_CAN(Can_Derive):
     def __init__(self, win_linux=0, imu_num=10, imu_msg_publisher = rospy.Publisher('ros_imu_pub', Imu, queue_size=10), 
-    imu_euler_publisher = rospy.Publisher('imu_euler_pub',IMU_Euler, queue_size=10), pub_mode = 0):
+    imu_euler_publisher = rospy.Publisher('imu_euler_pub',IMU_Euler_msg, queue_size=10), pub_mode = 0):
         Can_Derive.__init__(self, win_linux=win_linux)
         self.__imu_num = imu_num
         self.__imu_msg_publisher = imu_msg_publisher
@@ -133,7 +133,7 @@ class HWT901B_CAN(Can_Derive):
             imu_data_process(list(vci_can_obj.Data), temp_can_id * 9 + 6, self.__imu_date_list,
                              vci_can_obj.Data[1] - 0x50)
             if self.__pub_mode == 0 or self.__pub_mode == 2:
-                imu_euler = IMU_Euler()
+                imu_euler = IMU_Euler_msg()
                 imu_euler.imu_can_id = vci_can_obj.ID
                 imu_euler.Roll = self.__imu_date_list[temp_can_id * 9 + 6 + 0] 
                 imu_euler.Pitch = self.__imu_date_list[temp_can_id * 9 + 6 + 1]
