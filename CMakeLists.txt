@@ -52,6 +52,7 @@ find_package(catkin REQUIRED COMPONENTS
  add_message_files(
    FILES
    IMU_Euler_msg.msg
+   X_Position_Acc_msg.msg
  )
 
 ## Generate services in the 'srv' folder
